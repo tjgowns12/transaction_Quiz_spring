@@ -1,0 +1,87 @@
+package com.care.transac;
+
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.care.service.MoneyBalServiceImpl;
+import com.care.service.MoneyDepositServiceImpl;
+import com.care.service.MoneySendingImpl;
+import com.care.service.MoneyService;
+import com.care.trans_dto.transDTO;
+
+/**
+ * Handles requests for the application home page.
+ */
+@Controller
+public class HomeController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	private MoneyService ms;
+	/**
+	 * Simply selects the home view to render by returning its name.
+	 */
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String home(Locale locale, Model model) {
+		logger.info("Welcome home! The client locale is {}.", locale);
+		
+		Date date = new Date();
+		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+		
+		String formattedDate = dateFormat.format(date);
+		
+		model.addAttribute("serverTime", formattedDate );
+		
+		return "home";
+	}
+	@RequestMapping("bank")
+	public String bank() {
+		
+		return "bank";
+	}
+	
+	
+	@RequestMapping("deposit")
+	public String deposit() {
+		return "deposit";
+	}
+	@RequestMapping("balance")
+	public String balance(Model model) {
+		ms=new MoneyBalServiceImpl();
+		ms.execute(model);
+		return "balance";
+	}
+	@RequestMapping("send")
+	public String send() {
+		return "send";
+	}
+	@RequestMapping("depo")
+	public String depo(transDTO dto,Model model) {
+		ms=new MoneyDepositServiceImpl();
+		model.addAttribute("money",dto);
+		ms.execute(model);
+		return "redirect:bank";
+	}
+	@RequestMapping("sending")
+	public String sending(Model model,transDTO dto) {
+		ms=new MoneySendingImpl();
+		model.addAttribute("send",dto);
+		ms.execute(model);
+		
+		
+		return "redirect:bank";
+	}
+
+	
+	
+	
+}
